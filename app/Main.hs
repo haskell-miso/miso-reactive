@@ -58,7 +58,11 @@ foreign export javascript "hs_start" main :: IO ()
 ----------------------------------------------------------------------------
 -- | `component` takes as arguments the initial model, update function, view function
 parent :: App ParentModel ParentAction
-parent = component emptyModel updateModel viewModel
+parent = (component emptyModel updateModel viewModel)
+#ifndef WASM
+  { styles = [ Href "https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css" ]
+  }
+#endif
 ----------------------------------------------------------------------------
 -- | Empty application state
 emptyModel :: ParentModel
