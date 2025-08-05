@@ -5,7 +5,7 @@ See live [here](https://reactive.haskell-miso.org/)
 
 This demonstrates "reactivity" between `Component` in `miso`.
 
-As of `1.9`, `miso` is now recursive. This means `miso` applications can embed other `miso` applications, and be distributed independently. The type `Component` has been introduced to facilitate this, and it is equipped with lifecycle mounting hooks (`mount` / `unmount`). This has necessitated a runtime system to manage `Component` internally.
+As of `1.9`, `miso` is now recursive. This means `miso` applications can embed other `miso` applications, and be distributed independently. The type `Component` has been introduced to facilitate this, and is equipped with lifecycle mounting hooks (`mount` / `unmount`). This has necessitated a runtime system to manage `Component` internally.
 
 This means `miso` now forms a graph of `Component` nested on the Virtual DOM tree, where each `Component` has its own `IORef model` state (a.k.a. "reactive variable") that can be synchronized between the parent / child relationship (unidirectionally or bidirectionally) in a type-safe, composable manner.
 
