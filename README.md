@@ -19,7 +19,7 @@ This is similar to [React props](https://react.dev/learn/passing-props-to-a-comp
 
 Lastly, this is all done in a type-safe way. `Component` is parameterized by `parent`, which is the type of the ancestor's `model` ("reactive variable"). This gives us type-safe, reactive `Component` composition.
 
-See [the source](https://github.com/haskell-miso/miso-reactive/blob/master/app/Main.hs) for more information.
+[The source](https://github.com/haskell-miso/miso-reactive/blob/master/app/Main.hs) maintains an example of sibling communication using the `<-->` reactive combinator.
 
 > [!TIP]
 > This requires installing [nix](https://nixos.org) with [Nix Flakes](https://wiki.nixos.org/wiki/Flakes) enabled.
