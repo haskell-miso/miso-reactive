@@ -1,7 +1,7 @@
 :ramen: :boom: miso-reactive
 ====================
 
-See live [here](https://github.com/haskell-miso/miso-reactive)
+See live [here](https://reactive.haskell-miso.org/)
 
 This demonstrates "reactivity" between `Component` in `miso`.
 
