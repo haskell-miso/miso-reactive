@@ -77,7 +77,7 @@ viewModel :: ParentModel -> View ParentModel ParentAction
 viewModel (ParentModel parentState _) = div_ []
   [ h1_ [] [ "🍜 💥 miso-reactive" ]
   , h4_ [] [ "This example demonstrates sibling communication via reactivity" ]
-  , h5_ [] [ "The (<-->) combinator facilitates model synchronization between Component" ]
+  , h5_ [] [ "The child components are synchronized on any event raised, the parent also retains its own state" ]
   , br_ []
   , h2_ [] [ "Parent Component" ]
   , button_
