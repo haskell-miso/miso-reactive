@@ -15,9 +15,11 @@ The `-->`, `<--`, `<-->` combinators have been introduced to allow users to esta
 
 Under the hood this is done through a broadcast `TChan`, to synchronize the `IORef model` of various `Component`. This is accomplished without imposing a recursive interface on end users (`miso` handles all the recursion under the hood).
 
-This is similar to [React props](https://react.dev/learn/passing-props-to-a-component), where a parent component can pass properties to its descendants, and they will inherit any changes the parent makes to that "prop". The difference with `miso` is that we accomplish this in a declarative way using `Lens` to sychronize state. This allows us to keep the `View` pure, and retain the isomorphism property. Furthermore, `miso` takes it a step further and allows declarative upstream communication with the `parent`. Whereas in React a callback would need to be passed to the child to invoke parent model changes, creating a more convoluted programming model. Lastly, a bidirectional synch can be done between `parent` and `child` using the `(<-->`) combinator. This allows sibling communication, using the parent as a proxy.
+This is similar to [React props](https://react.dev/learn/passing-props-to-a-component), where a parent component can pass properties to its descendants, and they will inherit any changes the parent makes to that "prop". The difference with `miso` is that we accomplish this in a declarative way using `Lens` to sychronize state. This allows us to keep the `View` pure, and retain the isomorphism property. Furthermore, `miso` takes it a step further and allows declarative upstream communication with the `parent`. Whereas in React a callback would need to be passed to the child to invoke parent model changes, creating a more convoluted programming model. A bidirectional synch can also be established between `parent` and `child` using the `(<-->`) combinator. This allows sibling communication, where the `parent` is used as a proxy.
 
 Lastly, this is all done in a type-safe way. `Component` is parameterized by `parent`, which is the type of the ancestor's `model` ("reactive variable"). This gives us type-safe, reactive `Component` composition.
+
+See [the source](https://github.com/haskell-miso/miso-reactive/blob/master/app/Main.hs) for more information.
 
 > [!TIP]
 > This requires installing [nix](https://nixos.org) with [Nix Flakes](https://wiki.nixos.org/wiki/Flakes) enabled.

@@ -23,10 +23,10 @@ data ParentModel
   , _childCounter :: Int
   } deriving (Show, Eq)
 ----------------------------------------------------------------------------
-counter :: Lens Model Int
+counter :: Lens ParentModel Int
 counter = lens _counter $ \record field -> record { _counter = field }
 ----------------------------------------------------------------------------
-childCounter :: Lens Model Int
+childCounter :: Lens ParentModel Int
 childCounter = lens _childCounter $ \record field -> record { _childCounter = field }
 ----------------------------------------------------------------------------
 -- | Sum type for App events
@@ -49,7 +49,7 @@ data ChildAction
 ----------------------------------------------------------------------------
 -- | Entry point for a miso application
 main :: IO ()
-main = run (startApp app)
+main = run (startApp Main.parent)
 ----------------------------------------------------------------------------
 -- | WASM export, required when compiling w/ the WASM backend.
 #ifdef WASM
@@ -57,41 +57,52 @@ foreign export javascript "hs_start" main :: IO ()
 #endif
 ----------------------------------------------------------------------------
 -- | `component` takes as arguments the initial model, update function, view function
-parent :: Component () Model Action
+parent :: App ParentModel ParentAction
 parent = component emptyModel updateModel viewModel
 ----------------------------------------------------------------------------
 -- | Empty application state
-emptyModel :: Model
-emptyModel = Model 0 0
+emptyModel :: ParentModel
+emptyModel = ParentModel 0 0
 ----------------------------------------------------------------------------
 -- | Updates model, optionally introduces side effects
-updateModel :: Action -> Transition Model Action
+updateModel :: ParentAction -> Transition ParentModel ParentAction
 updateModel = \case
-  AddOne ->
+  ParentAdd ->
     counter += 1
-  SubtractOne ->
+  ParentSubtract ->
     counter -= 1
 ----------------------------------------------------------------------------
 -- | Constructs a virtual DOM from a model
-viewModel :: Model -> View Model Action
-viewModel (Model parentState _) = div_ []
-  [ button_
-    [ onClick AddOne ]
-    [ text "+" ]
-  , div_
-    [ id_ "child components"
-    ]
-    [ div_  [ key_ @MisoString "component-1" ] +> childComponent "one"
-    , div_  [ key_ @MisoString "component-2" ] +> childComponent "two"
-    ]
+viewModel :: ParentModel -> View ParentModel ParentAction
+viewModel (ParentModel parentState _) = div_ []
+  [ h1_ [] [ "🍜 💥 miso-reactive" ]
+  , h4_ [] [ "This example demonstrates sibling communication via reactivity" ]
+  , h5_ [] [ "The (<-->) combinator facilitates model synchronization between Component" ]
+  , br_ []
+  , h2_ [] [ "Parent Component" ]
   , button_
-    [ onClick SubtractOne ]
+    [ onClick ParentAdd ]
+    [ text "+" ]
+  , text (ms parentState)
+  , button_
+    [ onClick ParentSubtract ]
     [ text "-" ]
-  , text ("Parent state: " <> ms parentState)
+  , br_ []
+  , div_
+    [ id_ "Child sibling components"
+    ]
+    [ div_
+      [ key_ @MisoString "component-1"
+      ] +> childComponent "one"
+    , br_ []
+    , div_
+      [ key_ @MisoString "component-2"
+      ] +> childComponent "two"
+    ]
   ]
 ----------------------------------------------------------------------------
 -- | Component used for distribution
-childComponent :: MisoString -> Component Model ChildModel ChildAction
+childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
 childComponent name = (component (ChildModel 0) updateChildModel childView_)
   { bindings =
       [ childCounter <--> x
@@ -101,16 +112,17 @@ childComponent name = (component (ChildModel 0) updateChildModel childView_)
       childView_ (ChildModel x_) =
         div_
         []
-        [ text ("Hi I'm: " <> name <> ms x_)
-        , button_ [ onClick ChildAddOne ] [ "child +" ]
-        , button_ [ onClick ChildSubtractOne ] [ "child -" ]
+        [ h3_ [] [ text ("Child Component " <> name) ]
+        , button_ [ onClick ChildAdd ] [ "+" ]
+        , text (ms x_)
+        , button_ [ onClick ChildSubtract ] [ "-" ]
         ]
 ----------------------------------------------------------------------------
 -- | Updates model, optionally introduces side effects
-updateChildModel :: ChildAction -> Effect Model ChildModel ChildAction
+updateChildModel :: ChildAction -> Effect ParentModel ChildModel ChildAction
 updateChildModel = \case
-  ChildAddOne ->
+  ChildAdd ->
     x += 1
-  ChildSubtractOne ->
+  ChildSubtract ->
     x -= 1
 ----------------------------------------------------------------------------
