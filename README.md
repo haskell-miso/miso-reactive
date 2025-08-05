@@ -11,7 +11,7 @@ This means `miso` now forms a graph of `Component` nested on the Virtual DOM tre
 
 `miso` has added the `"bindings"` field to establish edges in the `Component` graph (between immediate ancestor and descendant). This allows data to "pulsate" through `Component` keeping data in synch. When used at multiple levels in the tree this creates a cascade effect.
 
-The `-->`, `<--`, `<-->` combinators have been introduced to allow users to establish eges between `Component` in the graph, in a declarative way. It takes as an argument two `Lens` which will synchronize changes between the `model` in the direction the user desires.
+The `-->`, `<--`, `<-->` combinators have been introduced to allow users to establish edges between `Component` in the graph, in a declarative way. It takes as an argument two `Lens` which will synchronize changes between the `model` in the direction the user desires.
 
 Under the hood this is done through a broadcast `TChan`, to synchronize the `IORef model` of various `Component`. This is accomplished without imposing a recursive interface on end users (`miso` handles all the recursion under the hood).
 
