@@ -110,7 +110,8 @@ viewModel (ParentModel parentState _) = div_ []
 childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
 childComponent name = (component (ChildModel 0) updateChildModel childView_)
   { bindings =
-      [ childCounter <--> x
+      [ _get childCounter --> _set x
+      , _set childCounter <-- _get x
       ]
   } where
       childView_ :: ChildModel -> View ChildModel ChildAction
