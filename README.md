@@ -5,6 +5,8 @@ See live [here](https://reactive.haskell-miso.org/)
 
 This demonstrates "reactivity" between `Component` in `miso`.
 
+## Example
+
 ```haskell
 ----------------------------------------------------------------------------
 childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
@@ -25,6 +27,8 @@ childComponent childComponentName = (component (ChildModel 0) noop view_)
         ]
 ```
 
+## Introduction
+
 As of `1.9`, `miso` is now recursive. This means `miso` applications can embed other `miso` applications, and be distributed independently. The type `Component` has been introduced to facilitate this, and is equipped with lifecycle mounting hooks (`mount` / `unmount`). This has necessitated a runtime system to manage `Component` internally.
 
 This means `miso` now forms a graph of `Component` nested on the Virtual DOM tree, where each `Component` has its own `IORef model` state (a.k.a. "reactive variable") that can be synchronized between the parent / child relationship (unidirectionally or bidirectionally) in a type-safe, composable manner.
@@ -39,13 +43,13 @@ This is similar to [React props](https://react.dev/learn/passing-props-to-a-comp
 
 Lastly, this is all done in a type-safe way. `Component` is parameterized by `parent`, which is the type of the ancestor's `model` ("reactive variable"). This gives us type-safe, reactive `Component` composition.
 
+## Development
+
 [The source](https://github.com/haskell-miso/miso-reactive/blob/master/app/Main.hs) maintains an example of sibling communication using the `<-->` reactive combinator.
 
 > [!TIP]
 > This requires installing [nix](https://nixos.org) with [Nix Flakes](https://wiki.nixos.org/wiki/Flakes) enabled.
 > Although not required, we recommend using [miso's binary cache](https://github.com/dmjio/miso?tab=readme-ov-file#binary-cache).
-
-### Development
 
 Call `nix develop` to enter a shell with [GHC 9.12.2](https://haskell.org/ghc)
 
