@@ -13,7 +13,7 @@ childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
 childComponent childComponentName = (component (ChildModel 0) noop view_)
   { bindings =
       [ parentField <---> childField
-        -- ^ dmj: Bidirectional synch between parent and child, using `Lens`
+        -- ^ dmj: Bidirectional synch between parent and child `model`, using `Lens`
       ]
   } where
       view_ :: ChildModel -> View ChildModel ChildAction
