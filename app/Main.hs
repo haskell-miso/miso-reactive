@@ -14,7 +14,7 @@ module Main where
 ----------------------------------------------------------------------------
 import Miso hiding (model)
 import Miso.String (MisoString, ms)
-import Miso.Lens
+import Control.Lens
 ----------------------------------------------------------------------------
 -- | Component model state
 data ParentModel
@@ -23,10 +23,10 @@ data ParentModel
   , _childCounter :: Int
   } deriving (Show, Eq)
 ----------------------------------------------------------------------------
-counter :: Lens ParentModel Int
+counter :: Lens' ParentModel Int
 counter = lens _counter $ \record field -> record { _counter = field }
 ----------------------------------------------------------------------------
-childCounter :: Lens ParentModel Int
+childCounter :: Lens' ParentModel Int
 childCounter = lens _childCounter $ \record field -> record { _childCounter = field }
 ----------------------------------------------------------------------------
 -- | Sum type for App events
@@ -35,10 +35,10 @@ data ParentAction
   | ParentSubtract
   deriving (Show, Eq)
 ----------------------------------------------------------------------------
-data ChildModel = ChildModel { _x :: Int }
+newtype ChildModel = ChildModel { _x :: Int }
   deriving (Eq, Show)
 ----------------------------------------------------------------------------
-x :: Lens ChildModel Int
+x :: Lens' ChildModel Int
 x = lens _x $ \record field -> record { _x = field }
 ----------------------------------------------------------------------------
 -- | Sum type for App events
@@ -110,8 +110,7 @@ viewModel (ParentModel parentState _) = div_ []
 childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
 childComponent name = (component (ChildModel 0) updateChildModel childView_)
   { bindings =
-      [ _get childCounter --> _set x
-      , _set childCounter <-- _get x
+      [ childCounter <---> x
       ]
   } where
       childView_ :: ChildModel -> View ChildModel ChildAction
