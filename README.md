@@ -31,7 +31,7 @@ childComponent childComponentName = (component (ChildModel 0) noop view_)
 
 As of `1.9`, `miso` is now recursive. This means `miso` applications can embed other `miso` applications, and be distributed independently. The type `Component` has been introduced to facilitate this, and is equipped with lifecycle mounting hooks (`mount` / `unmount`). This has necessitated a runtime system to manage `Component` internally.
 
-This means `miso` now forms a graph of `Component` nested on the Virtual DOM tree, where each `Component` has its own `IORef model` state (a.k.a. "reactive variable") that can be synchronized between the parent / child relationship (unidirectionally or bidirectionally) in a type-safe, composable manner.
+This means `miso` now forms a graph of `Component` nested on the Virtual DOM, where each `Component` has its own `IORef model` state (a.k.a. "reactive variable") that can be synchronized between the parent / child relationship (unidirectionally or bidirectionally) in a type-safe, composable manner.
 
 `miso` has added the `"bindings"` field to establish edges in the `Component` graph (between immediate ancestor and descendant). This allows data to "pulsate" through `Component` keeping data in synch. When used at multiple levels in the tree this creates a cascade effect.
 
