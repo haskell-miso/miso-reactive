@@ -5,6 +5,26 @@ See live [here](https://reactive.haskell-miso.org/)
 
 This demonstrates "reactivity" between `Component` in `miso`.
 
+```haskell
+----------------------------------------------------------------------------
+childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
+childComponent childComponentName = (component (ChildModel 0) noop view_)
+  { bindings =
+      [ parentField <---> childField
+        -- ^ dmj: Bidirectional synch between parent and child, using `Lens`
+      ]
+  } where
+      view_ :: ChildModel -> View ChildModel ChildAction
+      view_ (ChildModel x) =
+        div_
+        []
+        [ h3_ [] [ text ("Child Component " <> childComponentName) ]
+        , button_ [ onClick ChildAdd ] [ "+" ]
+        , text (ms x)
+        , button_ [ onClick ChildSubtract ] [ "-" ]
+        ]
+```
+
 As of `1.9`, `miso` is now recursive. This means `miso` applications can embed other `miso` applications, and be distributed independently. The type `Component` has been introduced to facilitate this, and is equipped with lifecycle mounting hooks (`mount` / `unmount`). This has necessitated a runtime system to manage `Component` internally.
 
 This means `miso` now forms a graph of `Component` nested on the Virtual DOM tree, where each `Component` has its own `IORef model` state (a.k.a. "reactive variable") that can be synchronized between the parent / child relationship (unidirectionally or bidirectionally) in a type-safe, composable manner.
