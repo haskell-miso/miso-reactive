@@ -5,7 +5,9 @@
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE TypeApplications           #-}
+{-# LANGUAGE RecordWildCards            #-}
 {-# LANGUAGE TemplateHaskell            #-}
+{-# LANGUAGE QuasiQuotes                #-}
 {-# LANGUAGE LambdaCase                 #-}
 {-# LANGUAGE DataKinds                  #-}
 {-# LANGUAGE CPP                        #-}
@@ -14,20 +16,19 @@ module Main where
 ----------------------------------------------------------------------------
 import Miso hiding (model)
 import Miso.String (MisoString, ms)
-import Control.Lens
+import Miso.Lens (Lens(..), lens, (-=), (+=), (^.))
+import Miso.Lens.TH (makeLenses)
+----------------------------------------------------------------------------
+import NeatInterpolation (trimming)
 ----------------------------------------------------------------------------
 -- | Component model state
 data ParentModel
   = ParentModel
-  { _counter :: Int
-  , _childCounter :: Int
+  { _parentCounter :: Int
+  , _proxy :: Int
   } deriving (Show, Eq)
 ----------------------------------------------------------------------------
-counter :: Lens' ParentModel Int
-counter = lens _counter $ \record field -> record { _counter = field }
-----------------------------------------------------------------------------
-childCounter :: Lens' ParentModel Int
-childCounter = lens _childCounter $ \record field -> record { _childCounter = field }
+$(makeLenses ''ParentModel)
 ----------------------------------------------------------------------------
 -- | Sum type for App events
 data ParentAction
@@ -35,11 +36,10 @@ data ParentAction
   | ParentSubtract
   deriving (Show, Eq)
 ----------------------------------------------------------------------------
-newtype ChildModel = ChildModel { _x :: Int }
+newtype ChildModel = ChildModel { _childCounter :: Int }
   deriving (Eq, Show)
 ----------------------------------------------------------------------------
-x :: Lens' ChildModel Int
-x = lens _x $ \record field -> record { _x = field }
+$(makeLenses ''ChildModel)
 ----------------------------------------------------------------------------
 -- | Sum type for App events
 data ChildAction
@@ -49,85 +49,338 @@ data ChildAction
 ----------------------------------------------------------------------------
 -- | Entry point for a miso application
 main :: IO ()
-main = run (startApp Main.parent)
+main = run (startApp Main.topLevel)
+----------------------------------------------------------------------------
+topLevel = (component () noop viewTop)
+#ifndef WASM
+  { styles = [ Href "assets/style.css" ]
+  }
+#endif
+  where
+    viewTop () =
+      div_
+      []
+      [ h1_ [] [ "🍜 miso-reactive 💥" ]
+      , div_
+        [ className "container"
+        ]
+        [ div_ [ className "box" ] +> box bidiParentChild (parentComponent bidiParentChild)
+        , div_ [ className "box" ] +> box bidiSibling (parentComponent bidiSibling)
+        , div_ [ className "box" ] +> box uniParent (parentComponent uniParent)
+        , div_ [ className "box" ] +> box uniChild (parentComponent uniChild)
+        ]
+      ]
+----------------------------------------------------------------------------
+data Example
+  = Example
+  { exampleBindings :: [ Binding ParentModel ChildModel ]
+  , exampleHeader :: MisoString
+  , exampleDescription :: MisoString
+  , exampleSource :: MisoString
+  }
+----------------------------------------------------------------------------
+-- | Bidirectional binding between parent and child
+bidiParentChild :: Example
+bidiParentChild = Example
+  { exampleBindings =
+      [ parentCounter <--> childCounter
+      ]
+  , exampleHeader = "Bidirectional (parent to child, child to parent)"
+  , exampleDescription = ms $
+      [trimming|
+         In this example any changes to parent state are automatically
+         propagated down to children. Simulataneously, any changes to children state
+         are propagated to the parent and by extension, all siblings as well.
+      |]
+  , exampleSource = ms $
+      [trimming|
+         // Code Example
+         data ParentModel
+           = ParentModel
+           { _parentCounter :: Int
+           , _proxy :: Int
+           } deriving (Show, Eq)
+
+         $(makeLenses ''ParentModel)
+
+          newtype ChildModel
+            = ChildModel
+            { _childCounter :: Int
+            } deriving (Eq, Show)
+
+         $(makeLenses ''ChildModel)
+
+         child
+           :: Component ParentModel ChildModel ChildAction
+         child = childComponent
+           { bindings =
+             [ parentCounter <--> childCounter
+             ]
+           }
+      |]                                  
+  }
+----------------------------------------------------------------------------
+-- | Unidirecational binding between parent and child
+uniParent :: Example
+uniParent = Example
+  { exampleBindings = [ _get parentCounter --> _set childCounter ]
+  , exampleHeader = "Unidirectional (parent-to-child)"
+  , exampleDescription = ms $
+      [trimming|
+         This example demonstrates unidirectional data flow where the
+         parent field changes synchronized to the child state. Children
+         can still alter their state, but any received updates from the
+         parent will immediately overwrite. Parent state remains unaffected
+         by child state changes.
+      |]
+  , exampleSource = ms $
+      [trimming|
+         // Code Example
+         data ParentModel
+           = ParentModel
+           { _parentCounter :: Int
+           , _proxy :: Int
+           } deriving (Show, Eq)
+
+         $(makeLenses ''ParentModel)
+
+          newtype ChildModel
+            = ChildModel
+            { _childCounter :: Int
+            } deriving (Eq, Show)
+
+         $(makeLenses ''ChildModel)
+
+         child
+           :: Component ParentModel ChildModel ChildAction
+         child = childComponent
+           { bindings =
+               [ _get parentCounter --> _set childCounter
+               ]
+           }
+      |]                                  
+  }
+----------------------------------------------------------------------------
+-- | Unidirecational binding between child to parent
+uniChild :: Example
+uniChild = Example
+  { exampleBindings = [ _set parentCounter <-- _get childCounter ]
+  , exampleHeader = "Unidirectional (child-to-parent)"
+  , exampleDescription = ms $
+      [trimming|
+         This example demonstrates unidirectional data flow where the
+         child field changes synchronize to the parent. The parent state
+         is overwritten by whichever child changes its state first.
+         Child states do not affect other sibling states. Parents can alter
+         their own states, but will be immediately overwritten by any child
+         state updates.
+      |]
+  , exampleSource = ms $
+      [trimming|
+         // Code Example
+         data ParentModel
+           = ParentModel
+           { _parentCounter :: Int
+           , _proxy :: Int
+           } deriving (Show, Eq)
+
+         $(makeLenses ''ParentModel)
+
+          newtype ChildModel
+            = ChildModel
+            { _childCounter :: Int
+            } deriving (Eq, Show)
+
+         $(makeLenses ''ChildModel)
+
+         child
+           :: Component ParentModel ChildModel ChildAction
+         child = childComponent
+           { bindings =
+             [ _set parentCounter <-- _get childCounter
+             ]
+           }
+      |]                                  
+  }
+----------------------------------------------------------------------------
+-- | Bidirectional binding between sibling (by way of parent)
+bidiSibling :: Example
+bidiSibling = Example
+  { exampleBindings =
+      [ proxy <--> childCounter
+      ]
+  , exampleHeader = "Bidirectional (sibling-to-sibling)"
+  , exampleDescription = ms $
+      [trimming|
+         This example demonstrates bidirectional sibling communication where the
+         parent field is used as a proxy to relay state information between
+         child siblings. The parent itself maintains its own state that is
+         unaffected during the child sibling model synchronization.
+      |]
+  , exampleSource = ms $
+      [trimming|
+         // Code Example
+         data ParentModel
+           = ParentModel
+           { _parentCounter :: Int
+           , _proxy :: Int
+           } deriving (Show, Eq)
+
+         $(makeLenses ''ParentModel)
+
+          newtype ChildModel
+            = ChildModel
+            { _childCounter :: Int
+            } deriving (Eq, Show)
+
+         $(makeLenses ''ChildModel)
+
+         child
+           :: Component ParentModel ChildModel ChildAction
+         child = childComponent
+           { bindings =
+               [ proxy <--> childCounter
+               ]
+           }
+      |]                                  
+  }
 ----------------------------------------------------------------------------
 -- | WASM export, required when compiling w/ the WASM backend.
 #ifdef WASM
 foreign export javascript "hs_start" main :: IO ()
 #endif
 ----------------------------------------------------------------------------
--- | `component` takes as arguments the initial model, update function, view function
-parent :: App ParentModel ParentAction
-parent = (component emptyModel updateModel viewModel)
-#ifndef WASM
-  { styles = [ Href "https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css" ]
-  }
-#endif
+-- | `Component` takes as arguments the initial model, update function, view function
+parentComponent
+  :: Example
+  -> Component parent ParentModel ParentAction
+parentComponent = component emptyModel updateModel . viewModel
+  where
+    updateModel = \case
+      ParentAdd ->
+        parentCounter += 1
+      ParentSubtract ->
+        parentCounter -= 1
 ----------------------------------------------------------------------------
 -- | Empty application state
 emptyModel :: ParentModel
 emptyModel = ParentModel 0 0
 ----------------------------------------------------------------------------
--- | Updates model, optionally introduces side effects
-updateModel :: ParentAction -> Transition ParentModel ParentAction
-updateModel = \case
-  ParentAdd ->
-    counter += 1
-  ParentSubtract ->
-    counter -= 1
-----------------------------------------------------------------------------
 -- | Constructs a virtual DOM from a model
-viewModel :: ParentModel -> View ParentModel ParentAction
-viewModel (ParentModel parentState _) = div_ []
-  [ h1_ [] [ "🍜 💥 miso-reactive" ]
-  , h4_ [] [ "This example demonstrates bidirectional sibling communication via reactivity" ]
-  , h5_ [] [ "The child components are synchronized bidirectionally via a field on the parent, the parent also retains its own state on a separate field" ]
-  , h5_ [] [ "Child 1 <--> Parent <--> Child 2" ]
-  , br_ []
-  , h2_ [] [ "Parent Component" ]
-  , button_
-    [ onClick ParentAdd ]
-    [ text "+" ]
-  , text (ms parentState)
-  , button_
-    [ onClick ParentSubtract ]
-    [ text "-" ]
-  , br_ []
-  , div_
-    [ id_ "Child sibling components"
+-- viewModel :: ParentModel -> View ParentModel ParentAction
+viewModel Example {..} m =
+  div_
+  [ className "counters-section"
+  ]
+  [ div_
+    [ class_ "counter-example"
     ]
-    [ div_
-      [ key_ @MisoString "component-1"
-      ] +> childComponent "one"
-    , br_ []
+    [ h3_ [] [ "Parent" ]
     , div_
-      [ key_ @MisoString "component-2"
-      ] +> childComponent "two"
+      [ class_ "counter"
+      ]
+      [ text $ ms (m ^. parentCounter)
+      ]
+    , div_
+      []
+      [ button_
+        [ class_ "btn btn-increment"
+        , onClick ParentAdd
+        ]
+        ["+"]
+      , button_
+        [ class_ "btn btn-decrement"
+        , onClick ParentSubtract
+        ]
+        ["-"]
+      ]
     ]
+  , div_ [ class_ "counter-example"
+    ] +> (childComponent "Child 1") { bindings = exampleBindings }
+  , div_ [ class_ "counter-example"
+    ] +> (childComponent "Child 2") { bindings = exampleBindings }
   ]
 ----------------------------------------------------------------------------
 -- | Component used for distribution
 childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
 childComponent name = (component (ChildModel 0) updateChildModel childView_)
-  { bindings =
-      [ childCounter <---> x
-      ]
-  } where
+  where
       childView_ :: ChildModel -> View ChildModel ChildAction
-      childView_ (ChildModel x_) =
+      childView_ m =
         div_
-        []
-        [ h3_ [] [ text ("Child Component " <> name) ]
-        , button_ [ onClick ChildAdd ] [ "+" ]
-        , text (ms x_)
-        , button_ [ onClick ChildSubtract ] [ "-" ]
+        [ className "counter-example"
+        ]
+        [ h3_ [] [ text name ]
+        , div_
+          [ class_ "counter"
+          ]
+          [ text $ ms (m ^. childCounter)
+          ]
+        , div_
+          []
+          [ button_
+            [ class_ "btn btn-increment"
+            , onClick ChildAdd
+            ]
+            [ "+"
+            ]
+          , button_
+            [ class_ "btn btn-decrement"
+            , onClick ChildSubtract
+            ]
+            [ "-"
+            ]
+          ]
         ]
 ----------------------------------------------------------------------------
 -- | Updates model, optionally introduces side effects
 updateChildModel :: ChildAction -> Effect ParentModel ChildModel ChildAction
 updateChildModel = \case
   ChildAdd ->
-    x += 1
+    childCounter += 1
   ChildSubtract ->
-    x -= 1
+    childCounter -= 1
+----------------------------------------------------------------------------
+box
+  :: Eq model
+  => Example 
+  -> Component () model action1
+  -> Component parent () action2
+box Example {..} vcomp = component () noop $ \() ->
+  div_
+    [ class_ "box"
+    ]
+    [ div_
+      [ class_ "box-header"
+      ]
+      [ text (ms exampleHeader)
+      ]
+    , div_
+      [ class_ "box-content"
+      ]
+      [ div_
+        [ class_ "counter-section"
+        ] +> vcomp
+      , div_
+        [ class_ "code-section" ]
+        [ div_
+          [ class_ "description" ]
+          [ h4_ []
+            [ "Description"
+            ]
+          , p_  []
+            [ text (ms exampleDescription)
+            ]
+          ]
+        , div_
+          [ class_ "code-block"
+          ]
+          [ pre_
+            []
+            [ text (ms exampleSource)
+            ]
+          ]
+        ]
+      ]
+    ]
 ----------------------------------------------------------------------------
