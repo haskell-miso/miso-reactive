@@ -54,13 +54,21 @@ main = run (startApp Main.topLevel)
 topLevel = (component () noop viewTop)
 #ifndef WASM
   { styles = [ Href "assets/style.css" ]
+  , scripts = [ Src "https://buttons.github.io/buttons.js" ]
   }
 #endif
   where
     viewTop () =
       div_
       []
-      [ h1_ [] [ "🍜 miso-reactive 💥" ]
+      [ h1_
+        []
+        [ "🍜 miso-reactive 💥"
+        ]
+      , h1_
+        []
+        [ githubStar
+        ]
       , div_
         [ className "container"
         ]
@@ -71,12 +79,25 @@ topLevel = (component () noop viewTop)
         ]
       ]
 ----------------------------------------------------------------------------
+githubStar :: View parent action
+githubStar = iframe_
+    [ title_ "GitHub"
+    , height_ "30"
+    , width_ "170"
+    , textProp "scrolling" "0"
+    , textProp "frameborder" "0"
+    , src_
+      "https://ghbtns.com/github-btn.html?user=haskell-miso&repo=miso-reactive&type=star&count=true&size=large"
+    ]
+    []
+
+----------------------------------------------------------------------------
 data Example
   = Example
-  { exampleBindings :: [ Binding ParentModel ChildModel ]
-  , exampleHeader :: MisoString
+  { exampleBindings    :: [ Binding ParentModel ChildModel ]
+  , exampleHeader      :: MisoString
   , exampleDescription :: MisoString
-  , exampleSource :: MisoString
+  , exampleSource      :: MisoString
   }
 ----------------------------------------------------------------------------
 -- | Bidirectional binding between parent and child
