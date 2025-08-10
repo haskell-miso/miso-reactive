@@ -128,9 +128,9 @@ uniParent = Example
   , exampleDescription = ms $
       [trimming|
          This example demonstrates unidirectional data flow where the
-         parent field changes synchronized to the child state. Children
+         parent field changes are synchronized to the child state. Children
          can still alter their state, but any received updates from the
-         parent will immediately overwrite. Parent state remains unaffected
+         parent will immediately overwrite childs state. Parent state remains unaffected
          by child state changes.
       |]
   , exampleSource = ms $
