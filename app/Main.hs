@@ -64,10 +64,10 @@ topLevel = (component () noop viewTop)
       , div_
         [ className "container"
         ]
-        [ div_ [ className "box" ] +> box bidiParentChild (parentComponent bidiParentChild)
-        , div_ [ className "box" ] +> box bidiSibling (parentComponent bidiSibling)
-        , div_ [ className "box" ] +> box uniParent (parentComponent uniParent)
+        [ div_ [ className "box" ] +> box uniParent (parentComponent uniParent)
         , div_ [ className "box" ] +> box uniChild (parentComponent uniChild)
+        , div_ [ className "box" ] +> box bidiParentChild (parentComponent bidiParentChild)
+        , div_ [ className "box" ] +> box bidiSibling (parentComponent bidiSibling)
         ]
       ]
 ----------------------------------------------------------------------------
