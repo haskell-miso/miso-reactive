@@ -60,13 +60,10 @@ topLevel = (component () noop viewTop)
     viewTop () =
       div_
       []
-      [ h1_
-        []
-        [ "🍜 miso-reactive 💥"
-        ]
+      [ githubStar
       , h1_
         []
-        [ githubStar
+        [ "🍜 miso-reactive 💥"
         ]
       , div_
         [ className "container"
@@ -89,7 +86,6 @@ githubStar = iframe_
       "https://ghbtns.com/github-btn.html?user=haskell-miso&repo=miso-reactive&type=star&count=true&size=large"
     ]
     []
-
 ----------------------------------------------------------------------------
 data Example
   = Example
