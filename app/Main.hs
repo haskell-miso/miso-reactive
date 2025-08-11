@@ -54,7 +54,6 @@ main = run (startApp Main.topLevel)
 topLevel = (component () noop viewTop)
 #ifndef WASM
   { styles = [ Href "assets/style.css" ]
-  , scripts = [ Src "https://buttons.github.io/buttons.js" ]
   }
 #endif
   where
