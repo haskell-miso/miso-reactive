@@ -139,7 +139,7 @@ bidiParentChild = Example
 -- | Unidirecational binding between parent and child
 uniParent :: Example
 uniParent = Example
-  { exampleBindings = [ _get parentCounter --> _set childCounter ]
+  { exampleBindings = [ parentCounter --> childCounter ]
   , exampleHeader = "Unidirectional (parent-to-child)"
   , exampleDescription = ms $
       [trimming|
@@ -171,7 +171,7 @@ uniParent = Example
            :: Component ParentModel ChildModel ChildAction
          child = childComponent
            { bindings =
-               [ _get parentCounter --> _set childCounter
+               [ parentCounter --> childCounter
                ]
            }
       |]                                  
@@ -180,7 +180,7 @@ uniParent = Example
 -- | Unidirecational binding between child to parent
 uniChild :: Example
 uniChild = Example
-  { exampleBindings = [ _set parentCounter <-- _get childCounter ]
+  { exampleBindings = [ parentCounter <-- childCounter ]
   , exampleHeader = "Unidirectional (child-to-parent)"
   , exampleDescription = ms $
       [trimming|
@@ -213,7 +213,7 @@ uniChild = Example
            :: Component ParentModel ChildModel ChildAction
          child = childComponent
            { bindings =
-             [ _set parentCounter <-- _get childCounter
+             [ parentCounter <-- childCounter
              ]
            }
       |]                                  
@@ -311,9 +311,11 @@ viewModel Example {..} m =
         ["-"]
       ]
     ]
-  , div_ [ class_ "counter-example"
+  , div_
+    [ class_ "counter-example"
     ] +> (childComponent "Child 1") { bindings = exampleBindings }
-  , div_ [ class_ "counter-example"
+  , div_
+    [ class_ "counter-example"
     ] +> (childComponent "Child 2") { bindings = exampleBindings }
   ]
 ----------------------------------------------------------------------------
