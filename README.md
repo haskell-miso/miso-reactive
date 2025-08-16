@@ -1,14 +1,15 @@
 :ramen: :boom: miso-reactive
 ====================
 
-See live [here](https://reactive.haskell-miso.org/)
+This demonstrates [reactivity](https://en.wikipedia.org/wiki/Functional_reactive_programming) between `Component` in [miso](https://github.com/dmjio/miso). See live [here](https://reactive.haskell-miso.org/)
 
-This demonstrates "reactivity" between `Component` in `miso`.
+<a href="https://reactive.haskell-miso.org/">
+<img width="1262" height="517" alt="image" src="https://github.com/user-attachments/assets/a49f8746-7959-4081-9490-4892cd07a989" />
+</a>
 
 ## Example
 
 ```haskell
-----------------------------------------------------------------------------
 childComponent :: MisoString -> Component ParentModel ChildModel ChildAction
 childComponent childComponentName = (component (ChildModel 0) noop view_)
   { bindings =
