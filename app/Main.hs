@@ -54,20 +54,16 @@ main = run (startApp Main.topLevel)
 topLevel = (component () noop viewTop)
 #ifndef WASM
   { styles = [ Href "assets/style.css" ]
-  , scripts = [ Src "https://buttons.github.io/buttons.js" ]
   }
 #endif
   where
     viewTop () =
       div_
       []
-      [ h1_
-        []
-        [ "🍜 miso-reactive 💥"
-        ]
+      [ githubStar
       , h1_
         []
-        [ githubStar
+        [ "🍜 miso-reactive 💥"
         ]
       , div_
         [ className "container"
@@ -90,7 +86,6 @@ githubStar = iframe_
       "https://ghbtns.com/github-btn.html?user=haskell-miso&repo=miso-reactive&type=star&count=true&size=large"
     ]
     []
-
 ----------------------------------------------------------------------------
 data Example
   = Example
@@ -144,7 +139,7 @@ bidiParentChild = Example
 -- | Unidirecational binding between parent and child
 uniParent :: Example
 uniParent = Example
-  { exampleBindings = [ _get parentCounter --> _set childCounter ]
+  { exampleBindings = [ parentCounter --> childCounter ]
   , exampleHeader = "Unidirectional (parent-to-child)"
   , exampleDescription = ms $
       [trimming|
@@ -176,7 +171,7 @@ uniParent = Example
            :: Component ParentModel ChildModel ChildAction
          child = childComponent
            { bindings =
-               [ _get parentCounter --> _set childCounter
+               [ parentCounter --> childCounter
                ]
            }
       |]                                  
@@ -185,7 +180,7 @@ uniParent = Example
 -- | Unidirecational binding between child to parent
 uniChild :: Example
 uniChild = Example
-  { exampleBindings = [ _set parentCounter <-- _get childCounter ]
+  { exampleBindings = [ parentCounter <-- childCounter ]
   , exampleHeader = "Unidirectional (child-to-parent)"
   , exampleDescription = ms $
       [trimming|
@@ -218,7 +213,7 @@ uniChild = Example
            :: Component ParentModel ChildModel ChildAction
          child = childComponent
            { bindings =
-             [ _set parentCounter <-- _get childCounter
+             [ parentCounter <-- childCounter
              ]
            }
       |]                                  
@@ -316,9 +311,11 @@ viewModel Example {..} m =
         ["-"]
       ]
     ]
-  , div_ [ class_ "counter-example"
+  , div_
+    [ class_ "counter-example"
     ] +> (childComponent "Child 1") { bindings = exampleBindings }
-  , div_ [ class_ "counter-example"
+  , div_
+    [ class_ "counter-example"
     ] +> (childComponent "Child 2") { bindings = exampleBindings }
   ]
 ----------------------------------------------------------------------------
