@@ -14,12 +14,15 @@
 ----------------------------------------------------------------------------
 module Main where
 ----------------------------------------------------------------------------
-import Miso hiding (model)
-import Miso.String (MisoString, ms)
-import Miso.Lens (Lens(..), lens, (-=), (+=), (^.))
-import Miso.Lens.TH (makeLenses)
+import           Miso hiding (model)
+import qualified Miso.Html.Element as H
+import qualified Miso.Html.Event as E
+import qualified Miso.Html.Property as P
+import           Miso.String (MisoString, ms)
+import           Miso.Lens (Lens(..), lens, (-=), (+=), (^.))
+import           Miso.Lens.TH (makeLenses)
 ----------------------------------------------------------------------------
-import NeatInterpolation (trimming)
+import           NeatInterpolation (trimming)
 ----------------------------------------------------------------------------
 -- | Component model state
 data ParentModel
@@ -58,31 +61,31 @@ topLevel = (component () noop viewTop)
 #endif
   where
     viewTop () =
-      div_
+      H.div_
       []
       [ githubStar
-      , h1_
+      , H.h1_
         []
         [ "🍜 miso-reactive 💥"
         ]
-      , div_
-        [ className "container"
+      , H.div_
+        [ P.className "container"
         ]
-        [ div_ [ className "box" ] +> box uniParent (parentComponent uniParent)
-        , div_ [ className "box" ] +> box uniChild (parentComponent uniChild)
-        , div_ [ className "box" ] +> box bidiParentChild (parentComponent bidiParentChild)
-        , div_ [ className "box" ] +> box bidiSibling (parentComponent bidiSibling)
+        [ H.div_ [ P.className "box" ] +> box uniParent (parentComponent uniParent)
+        , H.div_ [ P.className "box" ] +> box uniChild (parentComponent uniChild)
+        , H.div_ [ P.className "box" ] +> box bidiParentChild (parentComponent bidiParentChild)
+        , H.div_ [ P.className "box" ] +> box bidiSibling (parentComponent bidiSibling)
         ]
       ]
 ----------------------------------------------------------------------------
 githubStar :: View parent action
-githubStar = iframe_
-    [ title_ "GitHub"
-    , height_ "30"
-    , width_ "170"
+githubStar = H.iframe_
+    [ P.title_ "GitHub"
+    , P.height_ "30"
+    , P.width_ "170"
     , textProp "scrolling" "0"
     , textProp "frameborder" "0"
-    , src_
+    , P.src_
       "https://ghbtns.com/github-btn.html?user=haskell-miso&repo=miso-reactive&type=star&count=true&size=large"
     ]
     []
@@ -285,37 +288,37 @@ emptyModel = ParentModel 0 0
 -- | Constructs a virtual DOM from a model
 -- viewModel :: ParentModel -> View ParentModel ParentAction
 viewModel Example {..} m =
-  div_
-  [ className "counters-section"
+  H.div_
+  [ P.className "counters-section"
   ]
-  [ div_
-    [ class_ "counter-example"
+  [ H.div_
+    [ P.class_ "counter-example"
     ]
-    [ h3_ [] [ "Parent" ]
-    , div_
-      [ class_ "counter"
+    [ H.h3_ [] [ "Parent" ]
+    , H.div_
+      [ P.class_ "counter"
       ]
       [ text $ ms (m ^. parentCounter)
       ]
-    , div_
+    , H.div_
       []
-      [ button_
-        [ class_ "btn btn-increment"
-        , onClick ParentAdd
+      [ H.button_
+        [ P.class_ "btn btn-increment"
+        , E.onClick ParentAdd
         ]
         ["+"]
-      , button_
-        [ class_ "btn btn-decrement"
-        , onClick ParentSubtract
+      , H.button_
+        [ P.class_ "btn btn-decrement"
+        , E.onClick ParentSubtract
         ]
         ["-"]
       ]
     ]
-  , div_
-    [ class_ "counter-example"
+  , H.div_
+    [ P.class_ "counter-example"
     ] +> (childComponent "Child 1") { bindings = exampleBindings }
-  , div_
-    [ class_ "counter-example"
+  , H.div_
+    [ P.class_ "counter-example"
     ] +> (childComponent "Child 2") { bindings = exampleBindings }
   ]
 ----------------------------------------------------------------------------
@@ -325,26 +328,26 @@ childComponent name = (component (ChildModel 0) updateChildModel childView_)
   where
       childView_ :: ChildModel -> View ChildModel ChildAction
       childView_ m =
-        div_
-        [ className "counter-example"
+        H.div_
+        [ P.className "counter-example"
         ]
-        [ h3_ [] [ text name ]
-        , div_
-          [ class_ "counter"
+        [ H.h3_ [] [ text name ]
+        , H.div_
+          [ P.class_ "counter"
           ]
           [ text $ ms (m ^. childCounter)
           ]
-        , div_
+        , H.div_
           []
-          [ button_
-            [ class_ "btn btn-increment"
-            , onClick ChildAdd
+          [ H.button_
+            [ P.class_ "btn btn-increment"
+            , E.onClick ChildAdd
             ]
             [ "+"
             ]
-          , button_
-            [ class_ "btn btn-decrement"
-            , onClick ChildSubtract
+          , H.button_
+            [ P.class_ "btn btn-decrement"
+            , E.onClick ChildSubtract
             ]
             [ "-"
             ]
@@ -365,35 +368,35 @@ box
   -> Component () model action1
   -> Component parent () action2
 box Example {..} vcomp = component () noop $ \() ->
-  div_
-    [ class_ "box"
+  H.div_
+    [ P.class_ "box"
     ]
-    [ div_
-      [ class_ "box-header"
+    [ H.div_
+      [ P.class_ "box-header"
       ]
       [ text (ms exampleHeader)
       ]
-    , div_
-      [ class_ "box-content"
+    , H.div_
+      [ P.class_ "box-content"
       ]
-      [ div_
-        [ class_ "counter-section"
+      [ H.div_
+        [ P.class_ "counter-section"
         ] +> vcomp
-      , div_
-        [ class_ "code-section" ]
-        [ div_
-          [ class_ "description" ]
-          [ h4_ []
+      , H.div_
+        [ P.class_ "code-section" ]
+        [ H.div_
+          [ P.class_ "description" ]
+          [ H.h4_ []
             [ "Description"
             ]
-          , p_  []
+          , H.p_  []
             [ text (ms exampleDescription)
             ]
           ]
-        , div_
-          [ class_ "code-block"
+        , H.div_
+          [ P.class_ "code-block"
           ]
-          [ pre_
+          [ H.pre_
             []
             [ text (ms exampleSource)
             ]
