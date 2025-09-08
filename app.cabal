@@ -19,7 +19,7 @@ executable app
   main-is:
     Main.hs
   build-depends:
-    base, miso, neat-interpolation
+    base, miso
   hs-source-dirs:
     app
   default-language:
