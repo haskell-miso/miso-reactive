@@ -2,6 +2,7 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE ScopedTypeVariables        #-}
 {-# LANGUAGE DerivingStrategies         #-}
+{-# LANGUAGE MultilineStrings           #-}
 {-# LANGUAGE OverloadedStrings          #-}
 {-# LANGUAGE FlexibleContexts           #-}
 {-# LANGUAGE TypeApplications           #-}
@@ -21,8 +22,6 @@ import qualified Miso.Html.Property as P
 import           Miso.String (MisoString, ms)
 import           Miso.Lens (Lens(..), lens, (-=), (+=), (^.))
 import           Miso.Lens.TH (makeLenses)
-----------------------------------------------------------------------------
-import           NeatInterpolation (trimming)
 ----------------------------------------------------------------------------
 -- | Component model state
 data ParentModel
@@ -105,14 +104,12 @@ bidiParentChild = Example
       [ parentCounter <--> childCounter
       ]
   , exampleHeader = "Bidirectional (parent to child, child to parent)"
-  , exampleDescription = ms $
-      [trimming|
+  , exampleDescription = """
          In this example any changes to parent state are automatically
          propagated down to children. Simulataneously, any changes to children state
          are propagated to the parent and by extension, all siblings as well.
-      |]
-  , exampleSource = ms $
-      [trimming|
+      """
+  , exampleSource = """
          // Code Example
          data ParentModel
            = ParentModel
@@ -136,7 +133,7 @@ bidiParentChild = Example
              [ parentCounter <--> childCounter
              ]
            }
-      |]                                  
+      """                                 
   }
 ----------------------------------------------------------------------------
 -- | Unidirecational binding between parent and child
@@ -144,16 +141,16 @@ uniParent :: Example
 uniParent = Example
   { exampleBindings = [ parentCounter --> childCounter ]
   , exampleHeader = "Unidirectional (parent-to-child)"
-  , exampleDescription = ms $
-      [trimming|
+  , exampleDescription =
+      """
          This example demonstrates unidirectional data flow where the
          parent field changes are synchronized to the child state. Children
          can still alter their state, but any received updates from the
          parent will immediately overwrite child state. Parent state remains unaffected
          by child state changes.
-      |]
-  , exampleSource = ms $
-      [trimming|
+      """
+  , exampleSource =
+      """
          // Code Example
          data ParentModel
            = ParentModel
@@ -177,7 +174,7 @@ uniParent = Example
                [ parentCounter --> childCounter
                ]
            }
-      |]                                  
+     """
   }
 ----------------------------------------------------------------------------
 -- | Unidirecational binding between child to parent
@@ -185,17 +182,17 @@ uniChild :: Example
 uniChild = Example
   { exampleBindings = [ parentCounter <-- childCounter ]
   , exampleHeader = "Unidirectional (child-to-parent)"
-  , exampleDescription = ms $
-      [trimming|
+  , exampleDescription =
+      """
          This example demonstrates unidirectional data flow where the
          child state changes synchronize to the parent. The parent state
          is overwritten by whichever child changes its state first.
          Child states do not affect other sibling states. Parents can alter
          their own states, but will be immediately overwritten by any child
          state updates.
-      |]
-  , exampleSource = ms $
-      [trimming|
+      """
+  , exampleSource =
+      """
          // Code Example
          data ParentModel
            = ParentModel
@@ -219,7 +216,7 @@ uniChild = Example
              [ parentCounter <-- childCounter
              ]
            }
-      |]                                  
+     """
   }
 ----------------------------------------------------------------------------
 -- | Bidirectional binding between sibling (by way of parent)
@@ -229,15 +226,15 @@ bidiSibling = Example
       [ proxy <--> childCounter
       ]
   , exampleHeader = "Bidirectional (sibling-to-sibling)"
-  , exampleDescription = ms $
-      [trimming|
+  , exampleDescription =
+      """
          This example demonstrates bidirectional sibling communication where the
          parent field is used as a proxy to relay state information between
          child siblings. The parent itself maintains its own state that is
          unaffected during the child sibling model synchronization.
-      |]
-  , exampleSource = ms $
-      [trimming|
+      """
+  , exampleSource =
+      """
          // Code Example
          data ParentModel
            = ParentModel
@@ -261,7 +258,7 @@ bidiSibling = Example
                [ proxy <--> childCounter
                ]
            }
-      |]                                  
+      """
   }
 ----------------------------------------------------------------------------
 -- | WASM export, required when compiling w/ the WASM backend.
