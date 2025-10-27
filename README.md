@@ -30,7 +30,7 @@ childComponent childComponentName = (component (ChildModel 0) noop view_)
 
 ## Introduction
 
-As of `1.9`, `miso` is now recursive. This means `miso` applications can embed other `miso` applications, and be distributed independently. The type `Component` has been introduced to facilitate this, and is equipped with lifecycle mounting hooks (`mount` / `unmount`). This has necessitated a runtime system to manage `Component` internally.
+As of `1.9`, `miso` is now recursive. This means `miso` applications can embed other `miso` applications, and be distributed independently. The type `Component` has been introduced to facilitate this, and is equipped with lifecycle mounting hooks (`mount` / `unmount`). This has necessitated a runtime system to manage `Component` internally. Component is now parameterized by parent, which is the type of the ancestor's model ("reactive variable"). This gives us type-safe, reactive Component composition.
 
 This means `miso` now forms a graph of `Component` nested on the Virtual DOM, where each `Component` has its own `IORef model` state (a.k.a. "reactive variable") that can be synchronized between the parent / child relationship (unidirectionally or bidirectionally) in a type-safe, composable manner.
 
@@ -41,8 +41,6 @@ The `-->`, `<--`, `<-->` reactive combinators have been introduced to allow user
 Under the hood this is done through a broadcast `TChan`, to synchronize the `IORef model` of various `Component`. This is accomplished without imposing a recursive interface on end users (`miso` handles all the recursion under the hood).
 
 This is similar to [React props](https://react.dev/learn/passing-props-to-a-component), where a parent component can pass properties to its descendants, and they will inherit any changes the parent makes to that "prop". The difference with `miso` is that we accomplish this in a declarative way using `Lens` to synchronize state. This allows us to keep the `View` pure, and retain the isomorphism property. Furthermore, `miso` takes it a step further and allows declarative upstream communication with the `parent`. Whereas in React a callback would need to be passed to the child to invoke parent model changes, creating a more convoluted programming model. A bidirectional synch can also be established between `parent` and `child` using the `(<-->)` combinator. This can allow sibling communication, where the `parent` is used as a proxy (as seen in the [example](https://reactive.haskell-miso.org)).
-
-Lastly, this is all done in a type-safe way. `Component` is now parameterized by `parent`, which is the type of the ancestor's `model` ("reactive variable"). This gives us type-safe, reactive `Component` composition.
 
 ## Development
 
