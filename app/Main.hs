@@ -15,6 +15,9 @@
 module Main where
 ----------------------------------------------------------------------------
 import Miso hiding (model)
+import Miso.Html
+import Miso.Html.Property
+import qualified Miso.Html.Property as P
 import Miso.String (MisoString, ms)
 import Miso.Lens (Lens(..), lens, (-=), (+=), (^.))
 import Miso.Lens.TH (makeLenses)
@@ -77,7 +80,7 @@ topLevel = (component () noop viewTop)
 ----------------------------------------------------------------------------
 githubStar :: View parent action
 githubStar = iframe_
-    [ title_ "GitHub"
+    [ P.title_ "GitHub"
     , height_ "30"
     , width_ "170"
     , textProp "scrolling" "0"
