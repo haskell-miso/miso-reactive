@@ -16,6 +16,7 @@
 module Main where
 ----------------------------------------------------------------------------
 import           Miso hiding (model)
+import qualified Miso.CSS as CSS
 import qualified Miso.Html.Element as H
 import qualified Miso.Html.Event as E
 import qualified Miso.Html.Property as P
@@ -64,8 +65,8 @@ topLevel = (component () noop viewTop)
       []
       [ githubStar
       , H.h1_
-        []
-        [ "🍜 miso-reactive 💥"
+        [ CSS.style_ [ CSS.fontFamily "monospace" ] ]
+        [ "🍜 💥 miso-reactive"
         ]
       , H.div_
         [ P.className "container"
