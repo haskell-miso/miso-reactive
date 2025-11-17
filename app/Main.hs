@@ -408,7 +408,7 @@ box Example {..} vcomp = component () update_ $ \() ->
           [ P.class_ "code-block language-haskell"
           ]
           [ H.code_
-            [ P.class_ "language-haskell", onCreatedWith_ Highlight ]
+            [ P.class_ "language-haskell", onCreatedWith Highlight ]
             [ text (ms exampleSource)
             ]
           ]
