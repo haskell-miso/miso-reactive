@@ -15,6 +15,9 @@
 ----------------------------------------------------------------------------
 module Main where
 ----------------------------------------------------------------------------
+import           Control.Monad (void)
+import           Language.Javascript.JSaddle
+----------------------------------------------------------------------------
 import           Miso hiding (model)
 import qualified Miso.CSS as CSS
 import qualified Miso.Html.Element as H
@@ -52,11 +55,21 @@ data ChildAction
 ----------------------------------------------------------------------------
 -- | Entry point for a miso application
 main :: IO ()
-main = run (startApp Main.topLevel)
+main = run $ startApp Main.topLevel
+----------------------------------------------------------------------------
+data TopAction = Highlight DOMRef
 ----------------------------------------------------------------------------
 topLevel = (component () noop viewTop)
 #ifndef WASM
-  { styles = [ Href "assets/style.css" ]
+  { scripts =
+      [ Src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"
+      , Src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/haskell.min.js"
+      , Script "hljs.highlightAll();"
+      ]
+  , styles =
+      [ Href "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css"
+      , Href "assets/style.css"
+      ]
   }
 #endif
   where
@@ -364,8 +377,8 @@ box
   :: Eq model
   => Example 
   -> Component () model action1
-  -> Component parent () action2
-box Example {..} vcomp = component () noop $ \() ->
+  -> Component parent () TopAction
+box Example {..} vcomp = component () update_ $ \() ->
   H.div_
     [ P.class_ "box"
     ]
@@ -391,15 +404,17 @@ box Example {..} vcomp = component () noop $ \() ->
             [ text (ms exampleDescription)
             ]
           ]
-        , H.div_
-          [ P.class_ "code-block"
+        , H.pre_
+          [ P.class_ "code-block language-haskell"
           ]
-          [ H.pre_
-            []
+          [ H.code_
+            [ P.class_ "language-haskell", onCreatedWith_ Highlight ]
             [ text (ms exampleSource)
             ]
           ]
         ]
       ]
-    ]
+    ] where
+        update_ (Highlight domRef) = io_ $ void $
+          jsg "hljs" # "highlightElement" $ [domRef]
 ----------------------------------------------------------------------------

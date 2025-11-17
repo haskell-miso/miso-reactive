@@ -23,7 +23,7 @@ executable app
   main-is:
     Main.hs
   build-depends:
-    base, miso
+    base, miso, jsaddle
   hs-source-dirs:
     app
   default-language:
