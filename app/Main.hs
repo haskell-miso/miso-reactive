@@ -16,7 +16,6 @@
 module Main where
 ----------------------------------------------------------------------------
 import           Control.Monad (void)
-import           Language.Javascript.JSaddle
 ----------------------------------------------------------------------------
 import           Miso hiding (model)
 import qualified Miso.CSS as CSS
