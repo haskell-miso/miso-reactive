@@ -54,7 +54,7 @@ data ChildAction
 ----------------------------------------------------------------------------
 -- | Entry point for a miso application
 main :: IO ()
-main = run $ startApp Main.topLevel
+main = startApp defaultEvents Main.topLevel
 ----------------------------------------------------------------------------
 data TopAction = Highlight DOMRef
 ----------------------------------------------------------------------------
