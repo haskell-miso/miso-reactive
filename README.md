@@ -38,7 +38,7 @@ The `-->`, `<--`, `<-->` reactive combinators have been introduced to allow user
 
 Under the hood this is done through a scheduler and a depth-first traversal of the `Component` graph. This is accomplished without imposing a recursive interface on end users (`miso` handles all the recursion under the hood).
 
-Furthermore, `miso` takes it a step further and allows declarative upstream communication with the `parent`. Whereas in React a callback would need to be passed to the child to invoke parent model changes, creating a more convoluted programming model. A bidirectional synch can also be established between `parent` and `child` using the `(<-->)` combinator. This can allow sibling communication, where the `parent` is used as a proxy (as seen in the [example](https://reactive.haskell-miso.org)).
+Furthermore, `miso` allows declarative upstream communication with the `parent`. Whereas in React a callback would need to be passed to the child to invoke parent model changes, creating a more convoluted programming model. A bidirectional synch can also be established between `parent` and `child` using the `(<-->)` combinator. This can allow sibling communication, where the `parent` is used as a proxy (as seen in the [example](https://reactive.haskell-miso.org)).
 
 ## Development
 
