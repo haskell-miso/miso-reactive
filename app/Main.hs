@@ -83,10 +83,10 @@ topLevel = (component () noop viewTop)
       , H.div_
         [ P.className "container"
         ]
-        [ H.div_ [ P.className "box" ] [ mount $ box uniParent (parentComponent uniParent) ]
-        , H.div_ [ P.className "box" ] [ mount $ box uniChild (parentComponent uniChild) ]
-        , H.div_ [ P.className "box" ] [ mount $ box bidiParentChild (parentComponent bidiParentChild) ]
-        , H.div_ [ P.className "box" ] [ mount $ box bidiSibling (parentComponent bidiSibling) ]
+        [ H.div_ [ P.className "box" ] [ mount_ $ box uniParent (parentComponent uniParent) ]
+        , H.div_ [ P.className "box" ] [ mount_ $ box uniChild (parentComponent uniChild) ]
+        , H.div_ [ P.className "box" ] [ mount_ $ box bidiParentChild (parentComponent bidiParentChild) ]
+        , H.div_ [ P.className "box" ] [ mount_ $ box bidiSibling (parentComponent bidiSibling) ]
         ]
       ]
 ----------------------------------------------------------------------------
@@ -326,10 +326,10 @@ viewModel Example {..} m =
     ]
   , H.div_
     [ P.class_ "counter-example"
-    ] [ mount $ (childComponent "Child 1") { bindings = exampleBindings } ]
+    ] [ mount_ $ (childComponent "Child 1") { bindings = exampleBindings } ]
   , H.div_
     [ P.class_ "counter-example"
-    ] [ mount $ (childComponent "Child 2") { bindings = exampleBindings } ]
+    ] [ mount_ $ (childComponent "Child 2") { bindings = exampleBindings } ]
   ]
 ----------------------------------------------------------------------------
 -- | Component used for distribution
@@ -391,7 +391,9 @@ box Example {..} vcomp = component () update_ $ \() ->
       ]
       [ H.div_
         [ P.class_ "counter-section"
-        ] [ mount vcomp ]
+        ]
+        [ mount_ vcomp
+        ]
       , H.div_
         [ P.class_ "code-section" ]
         [ H.div_
