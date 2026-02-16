@@ -51,7 +51,7 @@ data ChildAction
 ----------------------------------------------------------------------------
 -- | Entry point for a miso application
 main :: IO ()
-main = run (startApp Main.topLevel)
+main = startApp defaultEvents Main.topLevel
 ----------------------------------------------------------------------------
 topLevel = (component () noop viewTop)
 #ifndef WASM
@@ -70,10 +70,10 @@ topLevel = (component () noop viewTop)
       , H.div_
         [ P.className "container"
         ]
-        [ H.div_ [ P.className "box" ] +> box uniParent (parentComponent uniParent)
-        , H.div_ [ P.className "box" ] +> box uniChild (parentComponent uniChild)
-        , H.div_ [ P.className "box" ] +> box bidiParentChild (parentComponent bidiParentChild)
-        , H.div_ [ P.className "box" ] +> box bidiSibling (parentComponent bidiSibling)
+        [ H.div_ [ P.className "box" ] [ mount_ $ box uniParent (parentComponent uniParent) ]
+        , H.div_ [ P.className "box" ] [ mount_ $ box uniChild (parentComponent uniChild) ]
+        , H.div_ [ P.className "box" ] [ mount_ $ box bidiParentChild (parentComponent bidiParentChild) ]
+        , H.div_ [ P.className "box" ] [ mount_ $ box bidiSibling (parentComponent bidiSibling) ]
         ]
       ]
 ----------------------------------------------------------------------------
@@ -313,10 +313,10 @@ viewModel Example {..} m =
     ]
   , H.div_
     [ P.class_ "counter-example"
-    ] +> (childComponent "Child 1") { bindings = exampleBindings }
+    ] [ mount_ (childComponent "Child 1") { bindings = exampleBindings } ]
   , H.div_
     [ P.class_ "counter-example"
-    ] +> (childComponent "Child 2") { bindings = exampleBindings }
+    ] [ mount_ (childComponent "Child 2") { bindings = exampleBindings } ]
   ]
 ----------------------------------------------------------------------------
 -- | Component used for distribution
@@ -378,7 +378,7 @@ box Example {..} vcomp = component () noop $ \() ->
       ]
       [ H.div_
         [ P.class_ "counter-section"
-        ] +> vcomp
+        ] [ mount_ vcomp ]
       , H.div_
         [ P.class_ "code-section" ]
         [ H.div_
