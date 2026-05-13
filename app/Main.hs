@@ -61,20 +61,18 @@ data TopAction = Highlight DOMRef
 topLevel = (component () noop viewTop)
 #ifndef WASM
   { scripts =
-      [ Src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"
-      , Src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/haskell.min.js"
+      [ Src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js" False
+      , Src "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/haskell.min.js" False
       , Script "hljs.highlightAll();"
       ]
   , styles =
-      [ Href "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css"
-      , Href "assets/style.css"
+      [ Href "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/default.min.css" False
+      , Href "assets/style.css" True
       ]
   }
 #endif
   where
-    viewTop () =
-      H.div_
-      []
+    viewTop () = vfrag
       [ githubStar
       , H.h1_
         [ CSS.style_ [ CSS.fontFamily "monospace" ] ]
